@@ -1,5 +1,6 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
@@ -31,7 +32,8 @@ app.post('/generate-pdf', async (req, res) => {
 
   let browser;
   try {
-    browser = await puppeteer.launch({
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    const launchOptions = {
       headless: true,
       args: [
         '--no-sandbox',
@@ -39,6 +41,15 @@ app.post('/generate-pdf', async (req, res) => {
         '--disable-dev-shm-usage',
         '--disable-gpu',
       ],
+    };
+
+    // Use system Chromium in containerized runtimes when configured.
+    if (executablePath && fs.existsSync(executablePath)) {
+      launchOptions.executablePath = executablePath;
+    }
+
+    browser = await puppeteer.launch({
+      ...launchOptions,
     });
 
     const page = await browser.newPage();

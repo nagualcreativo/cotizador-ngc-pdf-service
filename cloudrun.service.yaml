@@ -1,0 +1,32 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: cotizador-ngc-pdf-service
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+    spec:
+      containerConcurrency: 1
+      timeoutSeconds: 300
+      containers:
+        - image: REGION-docker.pkg.dev/PROJECT_ID/REPOSITORY/cotizador-ngc-pdf-service:TAG
+          ports:
+            - containerPort: 3001
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3001"
+            - name: PUPPETEER_EXECUTABLE_PATH
+              value: "/usr/bin/chromium"
+            - name: PDF_SERVICE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: PDF_SERVICE_SECRET
+                  key: latest
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
