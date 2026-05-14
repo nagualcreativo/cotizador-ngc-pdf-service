@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 const app = express();
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '10mb' }));
 
 // Security: deny direct browser access
 app.use((req, res, next) => {
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 });
 
 app.post('/generate-pdf', async (req, res) => {
-  const { html } = req.body;
+  const { html, headerTemplate, footerTemplate, displayHeaderFooter } = req.body;
   if (!html || typeof html !== 'string') {
     return res.status(400).json({ error: 'Missing html field' });
   }
@@ -48,17 +48,24 @@ app.post('/generate-pdf', async (req, res) => {
       launchOptions.executablePath = executablePath;
     }
 
-    browser = await puppeteer.launch({
-      ...launchOptions,
-    });
+    browser = await puppeteer.launch(launchOptions);
 
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    await page.setContent(html, { waitUntil: 'networkidle2' });
+
+    const useHeaderFooter = !!(displayHeaderFooter || headerTemplate || footerTemplate);
 
     const pdf = await page.pdf({
       format: 'Letter',
       printBackground: true,
-      margin: { top: '20mm', bottom: '20mm', left: '15mm', right: '15mm' },
+      displayHeaderFooter: useHeaderFooter,
+      // headerTemplate vacío por defecto para evitar el header por defecto de Chromium
+      headerTemplate: headerTemplate || '<span></span>',
+      // footerTemplate vacío por defecto
+      footerTemplate: footerTemplate || '<span></span>',
+      // margin.top reserva el espacio donde Puppeteer inyecta el headerTemplate.
+      // El CSS del body NO debe definir @page { margin } o lo sobrescribiría.
+      margin: { top: '170px', bottom: '90px', left: 0, right: 0 },
     });
 
     res.setHeader('Content-Type', 'application/pdf');
