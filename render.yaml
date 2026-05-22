@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: cotizador-ngc-pdf-service
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PDF_SERVICE_SECRET
+        sync: false # Set this in the Render dashboard for security
+    healthCheckPath: /health
+    dockerContext: .
+    dockerfilePath: Dockerfile
+    # Render automatically uses the EXPOSE port in Dockerfile
+    # If you want to override, add:
+    #  - key: PORT
+    #    value: "3001"

@@ -3,3 +3,8 @@ npm-debug.log*
 .git
 .gitignore
 .env
+dist
+tmp
+*.md
+render.yaml
+Dockerfile
