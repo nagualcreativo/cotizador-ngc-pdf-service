@@ -5,6 +5,9 @@ const fs = require("fs");
 const app = express();
 app.use(express.json({ limit: "10mb" }));
 
+// Serve static assets at /assets/
+app.use("/assets", express.static(__dirname + "/public"));
+
 // Security: deny direct browser access
 app.use((req, res, next) => {
   res.setHeader("X-Robots-Tag", "noindex, nofollow");
