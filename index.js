@@ -59,7 +59,7 @@ app.post("/generate-pdf", async (req, res) => {
     browser = await puppeteer.launch(launchOptions);
 
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle2", timeout: 60000 });
+    await page.setContent(html, { waitUntil: "networkidle2", timeout: 600000 });
 
     const useHeaderFooter = !!(
       displayHeaderFooter ||
