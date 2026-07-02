@@ -7,4 +7,5 @@ dist
 tmp
 *.md
 render.yaml
+railway.toml
 Dockerfile

@@ -2,7 +2,12 @@ services:
   - type: web
     name: cotizador-ngc-pdf-service
     runtime: docker
-    plan: free
+    # Recommended: "starter" (512 MB) works with the singleton browser + recycle
+    # strategy and the --js-flags=--max-old-space-size=256 Chromium flag.
+    # Upgrade to "standard" (2 GB) if you see OOM kills under sustained load.
+    # The "free" plan (512 MB) is usable but leaves almost no headroom; a single
+    # large PDF can push RSS above 400 MB temporarily.
+    plan: starter
     autoDeploy: true
     envVars:
       - key: PDF_SERVICE_SECRET

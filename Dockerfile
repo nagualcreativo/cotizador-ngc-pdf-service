@@ -41,8 +41,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libxss1 \
     libxtst6 \
-    wget \
-    xdg-utils \
   && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
@@ -54,7 +52,8 @@ RUN npm ci --omit=dev
 COPY . .
 
 ENV NODE_ENV=production
-ENV PORT=3001
+# PORT is intentionally NOT set here — Railway injects it at runtime.
+# The app falls back to 3001 for local development (see index.js).
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 EXPOSE 3001
